@@ -11,6 +11,9 @@ interface CourseDetailDao {
     @Query("SELECT * FROM course_detail where course_id = :courseId ORDER BY record_time")
     fun loadCourseAllRecord(courseId: Long): LiveData<List<CourseDetailWithItems>>
 
+    @Query("select * from course_detail where id = :id")
+    fun loadCourseRecord(id: Long): CourseDetailWithItems
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertRecord(courseDetail: CourseDetail): Long
 

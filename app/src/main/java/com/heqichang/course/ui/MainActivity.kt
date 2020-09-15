@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.heqichang.course.R
 import com.heqichang.course.adapter.MainRecyclerViewAdapter
+import com.heqichang.course.ui.fragment.EditDetailFragment
 import com.heqichang.course.viewmodel.MainViewModel
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -57,6 +58,9 @@ class MainActivity : AppCompatActivity(), MainRecyclerViewAdapter.MainRecyclerVi
 
         if (item.itemId == R.id.add_item) {
 
+            var fragment = EditDetailFragment()
+            fragment.show(supportFragmentManager, "dialog")
+            return true
 
             val addView = layoutInflater.inflate(R.layout.edit_course_item, null, false)
             val nameEditText: EditText = addView.findViewById(R.id.edit_text_course_name)

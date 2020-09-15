@@ -55,6 +55,8 @@ class DetailActivity : AppCompatActivity(), CalendarView.OnCalendarSelectListene
 
 
 
+
+
                 } else {
                     DialogUtil.getInstance().showEditRecordDialog(this, title, object: OnEditRecordSubmitListener {
                         override fun recordSubmit(type: Int, note: String?) {

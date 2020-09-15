@@ -14,7 +14,7 @@ class CourseDetailRepo(context: Context) {
     private var courseDao = db.courseDao()
     private var courseDetailItemDao = db.courseDetailItemDao()
 
-    fun getCourseRecord(courseId: Long): LiveData<List<CourseDetailWithItems>> {
+    fun getCourseAllRecord(courseId: Long): LiveData<List<CourseDetailWithItems>> {
         return courseDetailDao.loadCourseAllRecord(courseId)
     }
 

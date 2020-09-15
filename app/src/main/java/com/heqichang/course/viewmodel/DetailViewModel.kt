@@ -2,6 +2,8 @@ package com.heqichang.course.viewmodel
 
 import android.app.Application
 import android.graphics.Color
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
@@ -39,7 +41,7 @@ class DetailViewModel(application: Application): AndroidViewModel(application) {
     }
 
     private fun mapDetailToCourseVM() {
-        records = Transformations.map(courseDetailRepo.getCourseRecord(courseId)) { details ->
+        records = Transformations.map(courseDetailRepo.getCourseAllRecord(courseId)) { details ->
 
             val result: MutableList<RecordViewModel> = mutableListOf()
             for (detail in details) {
@@ -70,6 +72,7 @@ class DetailViewModel(application: Application): AndroidViewModel(application) {
         var day = cal.get(Calendar.DATE)
 
         val result = com.haibin.calendarview.Calendar()
+        result.scheme = courseDetail.detail.id.toString() // trick：用来保存 id
         result.year = year
         result.month = month + 1
         result.day = day
@@ -95,18 +98,19 @@ class DetailViewModel(application: Application): AndroidViewModel(application) {
         }
 
         result.schemes = schemeList
+
         return result
     }
 
     private fun mapDetailToCalendar() {
-        calendars = Transformations.map(courseDetailRepo.getCourseRecord(courseId)) { details ->
+        calendars = Transformations.map(courseDetailRepo.getCourseAllRecord(courseId)) { details ->
             details.map { item ->
                 detailToCalendar(item)
             }
         }
     }
 
-    data class RecordViewModel(
+    data class RecordViewModel (
         var detailId: Long?,
         var itemId: Long?,
         var type: Int,
