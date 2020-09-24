@@ -12,7 +12,7 @@ interface CourseDetailDao {
     fun loadCourseAllRecord(courseId: Long): LiveData<List<CourseDetailWithItems>>
 
     @Query("select * from course_detail where id = :id")
-    fun loadCourseRecord(id: Long): CourseDetailWithItems
+    fun loadCourseRecord(id: Long): LiveData<CourseDetailWithItems>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertRecord(courseDetail: CourseDetail): Long

@@ -18,6 +18,10 @@ class CourseDetailRepo(context: Context) {
         return courseDetailDao.loadCourseAllRecord(courseId)
     }
 
+    fun getDetailWithItems(detailId: Long): LiveData<CourseDetailWithItems> {
+        return courseDetailDao.loadCourseRecord(detailId)
+    }
+
     fun addCourseRecord(courseId: Long, type: Int, recordTime: Long, note: String?) {
 
         if (courseId.equals(0)) {

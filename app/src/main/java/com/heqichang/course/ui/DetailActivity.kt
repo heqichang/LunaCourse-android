@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import com.haibin.calendarview.Calendar
 import com.haibin.calendarview.CalendarView
+import com.heqichang.course.ui.fragment.EditDetailFragment
 import com.heqichang.course.ui.view.DialogUtil
 import com.heqichang.course.ui.view.OnEditRecordSubmitListener
 import com.heqichang.course.viewmodel.DetailViewModel
@@ -53,10 +54,11 @@ class DetailActivity : AppCompatActivity(), CalendarView.OnCalendarSelectListene
                 val title = "${it.year}-${it.month}-${it.day}"
                 if (it.hasScheme()) {
 
+                    it.scheme.toLong().let { detailId ->
 
-
-
-
+                        val fragment = EditDetailFragment.newInstance(detailId)
+                        fragment.show(supportFragmentManager, "dialog")
+                    }
                 } else {
                     DialogUtil.getInstance().showEditRecordDialog(this, title, object: OnEditRecordSubmitListener {
                         override fun recordSubmit(type: Int, note: String?) {

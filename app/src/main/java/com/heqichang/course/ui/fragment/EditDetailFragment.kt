@@ -7,10 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import com.heqichang.course.R
 import com.heqichang.course.model.CourseDetailWithItems
+import com.heqichang.course.viewmodel.EditDetailViewModel
 
-private const val ARG_DETAIL = "detail"
+private const val ARG_DETAIL_ID = "detail_id"
 
 /**
  * A simple [Fragment] subclass.
@@ -18,10 +20,11 @@ private const val ARG_DETAIL = "detail"
  * create an instance of this fragment.
  */
 class EditDetailFragment : DialogFragment() {
-//    private var param1: String? = null
-//    private var param2: String? = null
 
-    private var detail: CourseDetailWithItems? = null
+    private var detailId: Long? = null
+
+
+    private val viewModel by viewModels<EditDetailViewModel>()
 
     private lateinit var dateTextView: TextView
 
@@ -29,8 +32,16 @@ class EditDetailFragment : DialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            detail = it.getParcelable(ARG_DETAIL)
+
+            detailId = it.getLong(ARG_DETAIL_ID)
+            detailId?.let { dId ->
+                viewModel.detailId = dId
+            }
         }
+
+        viewModel.getDetail()?.observe(this, {
+            dateTextView.text = it?.dateString
+        })
     }
 
     override fun onCreateView(
@@ -52,17 +63,15 @@ class EditDetailFragment : DialogFragment() {
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.
          *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
+         * @param detailId 详情id
          * @return A new instance of fragment EditDetailFragment.
          */
         @JvmStatic
-        fun newInstance() =
+        fun newInstance(detailId: Long) =
             EditDetailFragment().apply {
-//                arguments = Bundle().apply {
-//                    putString(ARG_PARAM1, param1)
-//                    putString(ARG_PARAM2, param2)
-//                }
+                arguments = Bundle().apply {
+                    putLong(ARG_DETAIL_ID, detailId)
+                }
             }
     }
 }
