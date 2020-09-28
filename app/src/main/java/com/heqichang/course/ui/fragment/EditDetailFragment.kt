@@ -5,10 +5,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import com.heqichang.course.R
+import com.heqichang.course.databinding.FragmentEditDetailBinding
 import com.heqichang.course.model.CourseDetailWithItems
 import com.heqichang.course.viewmodel.EditDetailViewModel
 
@@ -26,7 +29,7 @@ class EditDetailFragment : DialogFragment() {
 
     private val viewModel by viewModels<EditDetailViewModel>()
 
-    private lateinit var dateTextView: TextView
+    private lateinit var binding: FragmentEditDetailBinding
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,9 +42,6 @@ class EditDetailFragment : DialogFragment() {
             }
         }
 
-        viewModel.getDetail()?.observe(this, {
-            dateTextView.text = it?.dateString
-        })
     }
 
     override fun onCreateView(
@@ -50,12 +50,22 @@ class EditDetailFragment : DialogFragment() {
     ): View? {
 
         // Inflate the layout for this fragment
-        val editView = inflater.inflate(R.layout.fragment_edit_detail, container, false)
-        dateTextView = editView.findViewById(R.id.textView2)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_edit_detail, container, false)
+
+        viewModel.getDetail()?.observe(this, {
+            binding.dateTextView.text = it?.dateString
+
+            val context = binding.root.context
+
+            for (item in it.items) {
+                val btn = Button(context)
+
+            }
+
+        })
 
 
-
-        return editView
+        return binding.root
     }
 
     companion object {
