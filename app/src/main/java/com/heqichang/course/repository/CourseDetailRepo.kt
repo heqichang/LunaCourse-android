@@ -52,6 +52,56 @@ class CourseDetailRepo(context: Context) {
         }
     }
 
+    fun addCourseItem(courseId: Long, detailId: Long, type: Int, note: String?) {
+
+        if (courseId.equals(0)) {
+            return
+        }
+
+        val courseDetailItem = CourseDetailItem()
+        courseDetailItem.courseId = courseId
+        courseDetailItem.detailId = detailId
+        courseDetailItem.recordType = type
+        courseDetailItem.note = note
+
+        val course = courseDao.loadCourse(courseId)
+        when(type) {
+            1 -> course.normalUsed++
+            2 -> course.absence++
+            3 -> course.additionalUsed++
+        }
+
+        db.runInTransaction {
+            courseDao.updateCourse(course)
+            courseDetailItemDao.insertItem(courseDetailItem)
+        }
+
+    }
+
+    fun updateItem(courseId: Long, itemId: Long, type: Int, note: String?) {
+
+        val item = courseDetailItemDao.getItem(itemId)
+
+        if (item.recordType != type) {
+            // 需要更新 course 统计数量
+            val course = courseDao.loadCourse(courseId)
+            when(type) {
+                1 -> course.normalUsed++
+                2 -> course.absence++
+                3 -> course.additionalUsed++
+            }
+            when(item.recordType) {
+                1 -> course.normalUsed--
+                2 -> course.absence--
+                3 -> course.additionalUsed--
+            }
+            item.recordType = type
+        }
+
+        item.note = note
+    }
+
+
     fun createRecord(): CourseDetail {
         return CourseDetail()
     }

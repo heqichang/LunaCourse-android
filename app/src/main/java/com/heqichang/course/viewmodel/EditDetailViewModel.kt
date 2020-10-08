@@ -3,6 +3,7 @@ package com.heqichang.course.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.heqichang.course.model.CourseDetailWithItems
 import com.heqichang.course.repository.CourseDetailRepo
@@ -15,8 +16,32 @@ class EditDetailViewModel(application: Application): AndroidViewModel(applicatio
     private var courseDetailRepo = CourseDetailRepo(getApplication())
     private var detail: LiveData<DetailViewModel>? = null
 
+    var currentItemIndex = 0
+    var currentItem = MutableLiveData<DetailItemViewModel>()
 
     fun update() {
+
+        detail?.let {
+            it.value?.let { detail ->
+
+
+                for (item in detail.items) {
+                    // 添加
+                    if (item.itemId == null) {
+                        courseDetailRepo.addCourseItem(detail.courseId ?: 0, detailId, item.type, item.note)
+                    } else {
+
+                    }
+                }
+
+
+
+
+            }
+        }
+
+
+
 
     }
 
@@ -32,11 +57,12 @@ class EditDetailViewModel(application: Application): AndroidViewModel(applicatio
 
         var items = mutableListOf<DetailItemViewModel>()
 
-        for (item in items) {
-            items.add(DetailItemViewModel(item.itemId, item.type, item.note))
+        for (item in model.items) {
+            items.add(DetailItemViewModel(item.id, item.recordType, item.note))
         }
 
-        return DetailViewModel(dateString, items)
+        currentItem.value = items.first()
+        return DetailViewModel(dateString, model.detail.courseId, items)
 
     }
 
@@ -51,9 +77,31 @@ class EditDetailViewModel(application: Application): AndroidViewModel(applicatio
         return detail
     }
 
+    fun selectIndex(index: Int) {
+        currentItemIndex = index
+        detail?.let { detail ->
+            detail.value?.let {
+                if (currentItemIndex < it.items.count()) {
+                    currentItem.value = it.items[currentItemIndex]
+                }
+            }
+        }
+    }
+
+    fun addItem() {
+
+        val newItem = DetailItemViewModel(null, 1, null)
+        detail?.let {
+            it.value?.let { model ->
+                model.items.add(newItem)
+            }
+        }
+    }
+
     data class DetailViewModel(
         var dateString: String,
-        var items: List<DetailItemViewModel>
+        var courseId: Long?,
+        var items: MutableList<DetailItemViewModel>
     )
 
     data class DetailItemViewModel(

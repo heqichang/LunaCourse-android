@@ -1,6 +1,10 @@
 package com.heqichang.course.ui.fragment
 
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
+import android.text.Editable
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +17,12 @@ import androidx.fragment.app.viewModels
 import com.heqichang.course.R
 import com.heqichang.course.databinding.FragmentEditDetailBinding
 import com.heqichang.course.model.CourseDetailWithItems
+import com.heqichang.course.ui.view.DialogUtil
+import com.heqichang.course.ui.view.OnEditRecordSubmitListener
 import com.heqichang.course.viewmodel.EditDetailViewModel
+import kotlinx.android.synthetic.main.fragment_edit_detail.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 private const val ARG_DETAIL_ID = "detail_id"
 
@@ -30,7 +39,7 @@ class EditDetailFragment : DialogFragment() {
     private val viewModel by viewModels<EditDetailViewModel>()
 
     private lateinit var binding: FragmentEditDetailBinding
-
+    private var signButtons = mutableListOf<Button>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,20 +61,96 @@ class EditDetailFragment : DialogFragment() {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_edit_detail, container, false)
 
+        // 确认按钮点击
+        binding.updateConfirmButton.setOnClickListener {
+
+            GlobalScope.launch {
+                viewModel.update()
+            }
+
+            this.dismiss()
+        }
+
         viewModel.getDetail()?.observe(this, {
             binding.dateTextView.text = it?.dateString
 
             val context = binding.root.context
 
-            for (item in it.items) {
-                val btn = Button(context)
+            binding.scrollViewLayout.removeAllViews()
+            signButtons.clear()
 
+            for ((index, item) in it.items.withIndex()) {
+                val btn = Button(context)
+                btn.text = "第${index + 1}次签到"
+                btn.textSize = 16F
+                btn.setOnClickListener {clickButton ->
+                    for ((clickIndex, clickItem) in signButtons.withIndex()) {
+                        if (clickButton === clickItem) {
+                            viewModel.selectIndex(clickIndex)
+                            activeButton()
+                            break
+                        }
+                    }
+                }
+                binding.scrollViewLayout.addView(btn)
+                signButtons.add(btn)
             }
+
+            val btn = Button(context)
+            btn.text = "+"
+            btn.textSize = 16F
+            btn.setOnClickListener {
+                viewModel.addItem()
+                addItemButton()
+            }
+            binding.scrollViewLayout.addView(btn)
+            activeButton()
+        })
+
+        viewModel.currentItem.observe(this, { currentItem ->
+
+            when (currentItem.type) {
+                1 -> normalCheckBox.isChecked = true
+                2 -> absenceCheckBox.isChecked = true
+                3 -> additionalCheckBox.isChecked = true
+            }
+
+            remarkEditText.text = Editable.Factory.getInstance().newEditable(currentItem.note ?: "")
 
         })
 
 
         return binding.root
+    }
+
+    private fun activeButton() {
+        if (viewModel.currentItemIndex < signButtons.count()) {
+            signButtons.forEach {
+                it.setTextColor(Color.BLACK)
+            }
+            signButtons[viewModel.currentItemIndex].setTextColor(Color.WHITE)
+        }
+    }
+
+    private fun addItemButton() {
+        signButtons.forEach {
+            it.setTextColor(Color.BLACK)
+        }
+        val btn = Button(context)
+        btn.text = "第${signButtons.count() + 1}次签到"
+        btn.textSize = 16F
+        btn.setOnClickListener {clickButton ->
+            for ((clickIndex, clickItem) in signButtons.withIndex()) {
+                if (clickButton === clickItem) {
+                    viewModel.selectIndex(clickIndex)
+                    activeButton()
+                    break
+                }
+            }
+        }
+        btn.setTextColor(Color.WHITE)
+        binding.scrollViewLayout.addView(btn, scrollViewLayout.childCount - 1)
+        signButtons.add(btn)
     }
 
     companion object {

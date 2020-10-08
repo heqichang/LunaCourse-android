@@ -47,46 +47,46 @@
                 android:id="@+id/scrollViewLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:orientation="vertical" />
+                android:orientation="horizontal" />
         </HorizontalScrollView>
 
         <CheckBox
-            android:id="@+id/checkBox4"
+            android:id="@+id/normalCheckBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="18dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginEnd="40dp"
             android:layout_marginBottom="5dp"
             android:text="上课"
-            app:layout_constraintBottom_toTopOf="@+id/editTextTextPersonName2"
-            app:layout_constraintEnd_toStartOf="@+id/checkBox5"
+            app:layout_constraintBottom_toTopOf="@+id/remarkEditText"
+            app:layout_constraintEnd_toStartOf="@+id/absenceCheckBox"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="parent" />
 
         <CheckBox
-            android:id="@+id/checkBox5"
+            android:id="@+id/absenceCheckBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
+            android:layout_marginEnd="40dp"
             android:layout_marginBottom="5dp"
             android:text="请假"
-            app:layout_constraintBottom_toTopOf="@+id/editTextTextPersonName2"
-            app:layout_constraintEnd_toStartOf="@+id/checkBox6"
-            app:layout_constraintStart_toEndOf="@+id/checkBox4" />
+            app:layout_constraintBottom_toTopOf="@+id/remarkEditText"
+            app:layout_constraintEnd_toStartOf="@+id/additionalCheckBox"
+            app:layout_constraintStart_toEndOf="@+id/normalCheckBox" />
 
         <CheckBox
-            android:id="@+id/checkBox6"
+            android:id="@+id/additionalCheckBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="7dp"
             android:layout_marginEnd="18dp"
             android:text="补课"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/checkBox5"
+            app:layout_constraintStart_toEndOf="@+id/absenceCheckBox"
             app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView" />
 
         <EditText
-            android:id="@+id/editTextTextPersonName2"
+            android:id="@+id/remarkEditText"
             android:layout_width="0dp"
             android:layout_height="53dp"
             android:layout_marginStart="17dp"
@@ -94,15 +94,15 @@
             android:layout_marginEnd="17dp"
             android:layout_marginBottom="22dp"
             android:ems="10"
+            android:hint="备注"
             android:inputType="textPersonName"
-            android:text="Name"
-            app:layout_constraintBottom_toTopOf="@+id/update_item_button"
+            app:layout_constraintBottom_toTopOf="@+id/updateConfirmButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/checkBox6" />
+            app:layout_constraintTop_toTopOf="@+id/additionalCheckBox" />
 
         <Button
-            android:id="@+id/delete_item_button"
+            android:id="@+id/deleteSignButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="80dp"
@@ -110,16 +110,16 @@
             android:layout_marginBottom="10dp"
             android:text="删除签到"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/update_item_button"
-            app:layout_constraintTop_toBottomOf="@+id/checkBox6" />
+            app:layout_constraintEnd_toStartOf="@+id/updateConfirmButton"
+            app:layout_constraintTop_toBottomOf="@+id/additionalCheckBox" />
 
         <Button
-            android:id="@+id/update_item_button"
+            android:id="@+id/updateConfirmButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="18dp"
             android:text="确认"
-            app:layout_constraintBaseline_toBaselineOf="@+id/delete_item_button"
+            app:layout_constraintBaseline_toBaselineOf="@+id/deleteSignButton"
             app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

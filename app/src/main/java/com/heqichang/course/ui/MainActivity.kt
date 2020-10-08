@@ -16,6 +16,7 @@ import com.heqichang.course.R
 import com.heqichang.course.adapter.MainRecyclerViewAdapter
 import com.heqichang.course.ui.fragment.EditDetailFragment
 import com.heqichang.course.viewmodel.MainViewModel
+import kotlinx.android.synthetic.main.edit_course_item.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -61,7 +62,6 @@ class MainActivity : AppCompatActivity(), MainRecyclerViewAdapter.MainRecyclerVi
             val addView = layoutInflater.inflate(R.layout.edit_course_item, null, false)
             val nameEditText: EditText = addView.findViewById(R.id.edit_text_course_name)
             val totalEditText: EditText = addView.findViewById(R.id.edit_text_course_total)
-
 
             val builder = AlertDialog.Builder(this)
             builder.setView(addView)

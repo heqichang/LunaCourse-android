@@ -7,6 +7,8 @@ import com.heqichang.course.model.CourseDetailItem
 @Dao
 interface CourseDetailItemDao {
 
+    @Query("select * from course_detail_item where id = :id")
+    fun getItem(id: Long): CourseDetailItem
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertItem(courseDetailItem: CourseDetailItem): Long
