@@ -1,5 +1,6 @@
 package com.heqichang.course.ui.fragment
 
+import android.app.AlertDialog
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
@@ -71,54 +72,92 @@ class EditDetailFragment : DialogFragment() {
             this.dismiss()
         }
 
-        viewModel.getDetail()?.observe(this, {
-            binding.dateTextView.text = it?.dateString
+        // 删除按钮点击
+        binding.deleteSignButton.setOnClickListener {
+            AlertDialog.Builder(context).setPositiveButton("确认") { _, _ ->
+                GlobalScope.launch {
+                    viewModel.deleteItem()
+                }
+            }
+                .setNegativeButton("取消", null)
+                .setMessage("确认删除本次签到？")
+                .show()
 
-            val context = binding.root.context
+        }
 
-            binding.scrollViewLayout.removeAllViews()
-            signButtons.clear()
+        // checkbox 点击
+        binding.normalCheckBox.setOnClickListener {
+            viewModel.checkType(1)
+        }
 
-            for ((index, item) in it.items.withIndex()) {
-                val btn = Button(context)
-                btn.text = "第${index + 1}次签到"
-                btn.textSize = 16F
-                btn.setOnClickListener {clickButton ->
-                    for ((clickIndex, clickItem) in signButtons.withIndex()) {
-                        if (clickButton === clickItem) {
-                            viewModel.selectIndex(clickIndex)
-                            activeButton()
-                            break
+        binding.absenceCheckBox.setOnClickListener {
+            viewModel.checkType(2)
+        }
+
+        binding.additionalCheckBox.setOnClickListener {
+            viewModel.checkType(3)
+        }
+
+        viewModel.getDetail()?.observe(this, { detailViewModel ->
+
+            if (detailViewModel == null) {
+                dismiss()
+            }
+
+            detailViewModel?.let {
+                binding.dateTextView.text = it.dateString
+
+                val context = binding.root.context
+
+                binding.scrollViewLayout.removeAllViews()
+                signButtons.clear()
+
+                for ((index, item) in it.items.withIndex()) {
+                    val btn = Button(context)
+                    btn.text = "第${index + 1}次签到"
+                    btn.textSize = 16F
+                    btn.setOnClickListener {clickButton ->
+                        for ((clickIndex, clickItem) in signButtons.withIndex()) {
+                            if (clickButton === clickItem) {
+                                viewModel.selectIndex(clickIndex)
+                                activeButton()
+                                break
+                            }
                         }
                     }
+                    binding.scrollViewLayout.addView(btn)
+                    signButtons.add(btn)
+                }
+
+                val btn = Button(context)
+                btn.text = "+"
+                btn.textSize = 16F
+                btn.setOnClickListener {
+                    viewModel.addItem()
+                    addItemButton()
+                    viewModel.selectIndex(signButtons.lastIndex)
                 }
                 binding.scrollViewLayout.addView(btn)
-                signButtons.add(btn)
+                activeButton()
             }
 
-            val btn = Button(context)
-            btn.text = "+"
-            btn.textSize = 16F
-            btn.setOnClickListener {
-                viewModel.addItem()
-                addItemButton()
-            }
-            binding.scrollViewLayout.addView(btn)
-            activeButton()
         })
 
-        viewModel.currentItem.observe(this, { currentItem ->
 
-            when (currentItem.type) {
+        viewModel.currentItemType.observe(this, { currentItemType ->
+            normalCheckBox.isChecked = false
+            absenceCheckBox.isChecked = false
+            additionalCheckBox.isChecked = false
+            when (currentItemType) {
                 1 -> normalCheckBox.isChecked = true
                 2 -> absenceCheckBox.isChecked = true
                 3 -> additionalCheckBox.isChecked = true
             }
-
-            remarkEditText.text = Editable.Factory.getInstance().newEditable(currentItem.note ?: "")
-
         })
 
+        viewModel.currentItemNote.observe(this, { note ->
+            remarkEditText.text = Editable.Factory.getInstance().newEditable(note ?: "")
+        })
 
         return binding.root
     }
@@ -152,6 +191,8 @@ class EditDetailFragment : DialogFragment() {
         binding.scrollViewLayout.addView(btn, scrollViewLayout.childCount - 1)
         signButtons.add(btn)
     }
+
+
 
     companion object {
         /**

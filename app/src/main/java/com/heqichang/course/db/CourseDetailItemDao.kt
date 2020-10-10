@@ -7,8 +7,11 @@ import com.heqichang.course.model.CourseDetailItem
 @Dao
 interface CourseDetailItemDao {
 
-    @Query("select * from course_detail_item where id = :id")
+    @Query("SELECT * FROM course_detail_item WHERE id = :id")
     fun getItem(id: Long): CourseDetailItem
+
+    @Query("SELECT COUNT(id) FROM course_detail_item WHERE detail_id = :detailId")
+    fun getCount(detailId: Long): Int
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertItem(courseDetailItem: CourseDetailItem): Long
@@ -19,4 +22,6 @@ interface CourseDetailItemDao {
     @Delete
     fun deleteItem(courseDetailItem: CourseDetailItem)
 
+    @Query("DELETE FROM course_detail_item WHERE course_id = :courseId")
+    fun deleteItemsByCourseId(courseId: Long)
 }

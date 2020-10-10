@@ -39,7 +39,7 @@ class MonthView(context: Context): MonthView(context) {
                 canvas?.drawRect(cx.toFloat(), cy.toFloat(), (cx + 20).toFloat(), (cy + 20).toFloat(), mSchemePaint)
 
                 cx += 40
-                if (cx > mItemWidth - 40) {
+                if (cx - x > mItemWidth - 40) {
                     cx = x + 20
                     cy += 40
                 }

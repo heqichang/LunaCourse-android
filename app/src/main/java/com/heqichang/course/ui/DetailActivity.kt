@@ -3,7 +3,12 @@ package com.heqichang.course.ui
 import androidx.appcompat.app.AppCompatActivity
 import com.heqichang.course.R
 import android.os.Bundle
+import android.text.Editable
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.EditText
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import com.haibin.calendarview.Calendar
 import com.haibin.calendarview.CalendarView
 import com.heqichang.course.ui.fragment.EditDetailFragment
@@ -11,8 +16,8 @@ import com.heqichang.course.ui.view.DialogUtil
 import com.heqichang.course.ui.view.OnEditRecordSubmitListener
 import com.heqichang.course.viewmodel.DetailViewModel
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import java.util.*
 
 
 class DetailActivity : AppCompatActivity(), CalendarView.OnCalendarSelectListener {
@@ -40,6 +45,59 @@ class DetailActivity : AppCompatActivity(), CalendarView.OnCalendarSelectListene
             calendarView.setSchemeDate(calendarMap)
         })
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val result = super.onCreateOptionsMenu(menu)
+        menuInflater.inflate(R.menu.detail_menu, menu)
+        return result
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        if (item.itemId == R.id.menuDeleteCourse) {
+            AlertDialog.Builder(this).setMessage("确定删除该课程信息吗？").setPositiveButton("确定") { _, _ ->
+
+                GlobalScope.launch {
+                    viewModel.deleteCourse()
+                }
+
+                finish()
+
+            }.setNegativeButton("取消", null).show()
+
+        } else if (item.itemId == R.id.menuEditCourse) {
+
+            val weakThis = this
+
+            GlobalScope.launch {
+                val course = viewModel.getCourse()
+
+                MainScope().launch {
+                    val addView = layoutInflater.inflate(R.layout.edit_course_item, null, false)
+                    val nameEditText: EditText = addView.findViewById(R.id.edit_text_course_name)
+                    nameEditText.text = Editable.Factory.getInstance().newEditable(course.name)
+                    val totalEditText: EditText = addView.findViewById(R.id.edit_text_course_total)
+                    totalEditText.text = Editable.Factory.getInstance().newEditable(course.total.toString())
+
+                    val builder = AlertDialog.Builder(weakThis)
+                    builder.setView(addView)
+                    builder.setPositiveButton("确定") { _, _ ->
+
+                        course.name = nameEditText.text.toString()
+                        course.total = totalEditText.text.toString().toInt()
+
+                        GlobalScope.launch {
+                            viewModel.updateCourse(course)
+                        }
+                    }
+
+                    builder.create().show()
+                }
+            }
+        }
+
+        return true
     }
 
     override fun onCalendarOutOfRange(calendar: Calendar?) {

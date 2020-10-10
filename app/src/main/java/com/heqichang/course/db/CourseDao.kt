@@ -22,4 +22,7 @@ interface CourseDao {
 
     @Delete
     fun deleteCourse(course: Course)
+
+    @Query("delete from course where id = :courseId")
+    fun deleteCourseById(courseId: Long)
 }

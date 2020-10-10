@@ -19,6 +19,8 @@ class DetailViewModel(application: Application): AndroidViewModel(application) {
 
     var courseId: Long = 0
     private var courseDetailRepo = CourseDetailRepo(getApplication())
+    private var courseRepo = CourseRepo(getApplication())
+
     private var records: LiveData<List<RecordViewModel>>? = null
     private var calendars: LiveData<List<com.haibin.calendarview.Calendar>>? = null
 
@@ -38,6 +40,18 @@ class DetailViewModel(application: Application): AndroidViewModel(application) {
             mapDetailToCalendar()
         }
         return calendars
+    }
+
+    fun deleteCourse() {
+        courseDetailRepo.deleteCourse(courseId)
+    }
+
+    fun getCourse(): Course {
+        return courseRepo.getCourse(courseId)
+    }
+
+    fun updateCourse(course: Course) {
+        courseRepo.updateCourse(course)
     }
 
     private fun mapDetailToCourseVM() {

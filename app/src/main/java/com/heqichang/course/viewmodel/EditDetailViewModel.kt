@@ -17,31 +17,27 @@ class EditDetailViewModel(application: Application): AndroidViewModel(applicatio
     private var detail: LiveData<DetailViewModel>? = null
 
     var currentItemIndex = 0
-    var currentItem = MutableLiveData<DetailItemViewModel>()
+    var currentItemType = MutableLiveData<Int>(0)
+    var currentItemNote = MutableLiveData<String>("")
+
 
     fun update() {
 
         detail?.let {
             it.value?.let { detail ->
-
-
                 for (item in detail.items) {
-                    // 添加
+
                     if (item.itemId == null) {
+                        // 添加
                         courseDetailRepo.addCourseItem(detail.courseId ?: 0, detailId, item.type, item.note)
                     } else {
-
+                        // 更新
+                        courseDetailRepo.updateItem(detail.courseId ?: 0, item.itemId!!, item.type, item.note)
                     }
                 }
 
-
-
-
             }
         }
-
-
-
 
     }
 
@@ -61,7 +57,11 @@ class EditDetailViewModel(application: Application): AndroidViewModel(applicatio
             items.add(DetailItemViewModel(item.id, item.recordType, item.note))
         }
 
-        currentItem.value = items.first()
+        val firstItem = items.first()
+        currentItemIndex = 0
+        currentItemType.value = firstItem.type
+        currentItemNote.value = firstItem.note
+
         return DetailViewModel(dateString, model.detail.courseId, items)
 
     }
@@ -82,7 +82,9 @@ class EditDetailViewModel(application: Application): AndroidViewModel(applicatio
         detail?.let { detail ->
             detail.value?.let {
                 if (currentItemIndex < it.items.count()) {
-                    currentItem.value = it.items[currentItemIndex]
+                    val item = it.items[currentItemIndex]
+                    currentItemType.value = item.type
+                    currentItemNote.value = item.note
                 }
             }
         }
@@ -96,6 +98,41 @@ class EditDetailViewModel(application: Application): AndroidViewModel(applicatio
                 model.items.add(newItem)
             }
         }
+    }
+
+    fun checkType(type: Int) {
+
+        detail?.let {
+            it.value?.let { detailModel ->
+                if (currentItemIndex >= detailModel.items.count()) {
+                    return
+                }
+                val item = detailModel.items[currentItemIndex]
+                if (item.type == type) {
+                    return
+                }
+
+                item.type = type
+                currentItemType.value = type
+            }
+        }
+    }
+
+    fun deleteItem() {
+
+        detail?.let {
+            it.value?.let { detailModel ->
+                if (currentItemIndex >= detailModel.items.count()) {
+                    return
+                }
+                val item = detailModel.items[currentItemIndex]
+                item.itemId?.let { itemId ->
+                    courseDetailRepo.deleteItem(itemId)
+                }
+
+            }
+        }
+
     }
 
     data class DetailViewModel(

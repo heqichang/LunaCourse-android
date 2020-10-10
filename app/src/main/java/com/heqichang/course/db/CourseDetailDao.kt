@@ -26,5 +26,7 @@ interface CourseDetailDao {
     @Delete
     fun deleteRecord(courseDetail: CourseDetail)
 
+    @Query("DELETE FROM course_detail WHERE course_id = :courseId")
+    fun deleteRecordsByCourseId(courseId: Long)
 
 }

@@ -82,23 +82,70 @@ class CourseDetailRepo(context: Context) {
 
         val item = courseDetailItemDao.getItem(itemId)
 
-        if (item.recordType != type) {
-            // 需要更新 course 统计数量
-            val course = courseDao.loadCourse(courseId)
-            when(type) {
-                1 -> course.normalUsed++
-                2 -> course.absence++
-                3 -> course.additionalUsed++
+        db.runInTransaction {
+            if (item.recordType != type) {
+                // 需要更新 course 统计数量
+                val course = courseDao.loadCourse(courseId)
+                when(type) {
+                    1 -> course.normalUsed++
+                    2 -> course.absence++
+                    3 -> course.additionalUsed++
+                }
+                when(item.recordType) {
+                    1 -> course.normalUsed--
+                    2 -> course.absence--
+                    3 -> course.additionalUsed--
+                }
+                item.recordType = type
+                courseDao.updateCourse(course)
             }
-            when(item.recordType) {
-                1 -> course.normalUsed--
-                2 -> course.absence--
-                3 -> course.additionalUsed--
-            }
-            item.recordType = type
+
+            item.note = note
+            courseDetailItemDao.updateItem(item)
         }
 
-        item.note = note
+    }
+
+    fun deleteItem(itemId: Long) {
+        db.runInTransaction {
+            val item = courseDetailItemDao.getItem(itemId)
+            val detailId = item.detailId ?: 0
+            val itemType = item.recordType
+            val courseId = item.courseId ?: 0
+            courseDetailItemDao.deleteItem(item)
+
+            if (detailId > 0) {
+                // 如果没有其它 items 记录删除 detail
+                val count = courseDetailItemDao.getCount(detailId)
+                if (count == 0) {
+                    val detail = courseDetailDao.loadCourseDetail(detailId)
+                    courseDetailDao.deleteRecord(detail)
+                }
+            }
+
+            // 更新课程统计记录
+            if (courseId > 0) {
+
+                val course = courseDao.loadCourse(courseId)
+                when (itemType) {
+                    1 -> course.normalUsed--
+                    2 -> course.absence--
+                    3 -> course.additionalUsed--
+                }
+                courseDao.updateCourse(course)
+            }
+
+        }
+
+    }
+
+    fun deleteCourse(courseId: Long) {
+
+        db.runInTransaction {
+            courseDao.deleteCourseById(courseId)
+            courseDetailDao.deleteRecordsByCourseId(courseId)
+            courseDetailItemDao.deleteItemsByCourseId(courseId)
+        }
     }
 
 
