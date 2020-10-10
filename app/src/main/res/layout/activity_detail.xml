@@ -12,19 +12,21 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
+        android:layout_marginBottom="1dp"
         android:background="#fff"
         app:current_day_text_color="#656765"
         app:current_month_lunar_text_color="#CFCFCF"
         app:current_month_text_color="#333333"
         app:day_text_size="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/detailRecyclerView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:lunar_text_size="8sp"
         app:min_year="2020"
+        app:month_view="com.heqichang.course.ui.view.MonthView"
         app:month_view_show_mode="mode_only_current"
         app:other_month_text_color="#e1e1e1"
-        app:month_view="com.heqichang.course.ui.view.MonthView"
         app:scheme_text="假"
         app:scheme_text_color="#333"
         app:scheme_theme_color="#128c4b"
@@ -38,5 +40,14 @@
         app:year_view_month_text_color="#ff0000"
         app:year_view_month_text_size="20sp"
         app:year_view_scheme_color="#f17706" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/detailRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/calendarView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

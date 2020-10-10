@@ -9,12 +9,16 @@ import android.view.MenuItem
 import android.widget.EditText
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.haibin.calendarview.Calendar
 import com.haibin.calendarview.CalendarView
+import com.heqichang.course.adapter.DetailRecyclerViewAdapter
 import com.heqichang.course.ui.fragment.EditDetailFragment
 import com.heqichang.course.ui.view.DialogUtil
 import com.heqichang.course.ui.view.OnEditRecordSubmitListener
 import com.heqichang.course.viewmodel.DetailViewModel
+import kotlinx.android.synthetic.main.activity_detail.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -23,11 +27,15 @@ import kotlinx.coroutines.launch
 class DetailActivity : AppCompatActivity(), CalendarView.OnCalendarSelectListener {
 
     private lateinit var calendarView: CalendarView
+    private lateinit var listRecyclerView: RecyclerView
+    private lateinit var adapter: DetailRecyclerViewAdapter
+
     private val viewModel by viewModels<DetailViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
+
 
         val courseId = intent.getLongExtra(MainActivity.INTENT_COURSE_ID_KEY, 0)
         viewModel.courseId = courseId
@@ -45,6 +53,15 @@ class DetailActivity : AppCompatActivity(), CalendarView.OnCalendarSelectListene
             calendarView.setSchemeDate(calendarMap)
         })
 
+        adapter = DetailRecyclerViewAdapter()
+
+        listRecyclerView = findViewById(R.id.detailRecyclerView)
+        listRecyclerView.layoutManager = LinearLayoutManager(this)
+        listRecyclerView.adapter = adapter
+
+        viewModel.getList()?.observe(this, {
+            adapter.reload(it)
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

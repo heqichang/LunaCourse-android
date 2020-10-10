@@ -21,19 +21,20 @@ class DetailViewModel(application: Application): AndroidViewModel(application) {
     private var courseDetailRepo = CourseDetailRepo(getApplication())
     private var courseRepo = CourseRepo(getApplication())
 
-    private var records: LiveData<List<RecordViewModel>>? = null
+    private var itemList: LiveData<List<RecordViewModel>>? = null
     private var calendars: LiveData<List<com.haibin.calendarview.Calendar>>? = null
 
     fun addRecord(type: Int, recordTime: Long, note: String?) {
         courseDetailRepo.addCourseRecord(courseId, type, recordTime, note)
     }
 
-    fun getRecords(): LiveData<List<RecordViewModel>>? {
-        if (records == null) {
-            mapDetailToCourseVM()
+    fun getList(): LiveData<List<RecordViewModel>>? {
+        if (itemList == null) {
+            mapDetailToVM()
         }
-        return records
+        return itemList
     }
+
 
     fun getCalendars(): LiveData<List<com.haibin.calendarview.Calendar>>? {
         if (calendars == null) {
@@ -52,28 +53,6 @@ class DetailViewModel(application: Application): AndroidViewModel(application) {
 
     fun updateCourse(course: Course) {
         courseRepo.updateCourse(course)
-    }
-
-    private fun mapDetailToCourseVM() {
-        records = Transformations.map(courseDetailRepo.getCourseAllRecord(courseId)) { details ->
-
-            val result: MutableList<RecordViewModel> = mutableListOf()
-            for (detail in details) {
-                val date = Date(detail.detail.recordTime)
-                val cal = Calendar.getInstance()
-                cal.time = date
-                val year = cal.get(Calendar.YEAR)
-                val month = cal.get(Calendar.MONTH)
-                var day = cal.get(Calendar.DATE)
-
-                for (item in detail.items) {
-                    val recordViewModel = RecordViewModel(detail.detail.id, item.id, item.recordType, year, month, day, item.note)
-                    result.add(recordViewModel)
-                }
-            }
-
-            result.toList()
-        }
     }
 
     private fun detailToCalendar(courseDetail: CourseDetailWithItems): com.haibin.calendarview.Calendar {
@@ -116,6 +95,24 @@ class DetailViewModel(application: Application): AndroidViewModel(application) {
         return result
     }
 
+    private fun detailToVM(courseDetailWithItems: CourseDetailWithItems): List<RecordViewModel> {
+        val date = Date(courseDetailWithItems.detail.recordTime)
+        val cal = Calendar.getInstance()
+        cal.time = date
+        val year = cal.get(Calendar.YEAR)
+        val month = cal.get(Calendar.MONTH)
+        var day = cal.get(Calendar.DATE)
+
+        var result = mutableListOf<RecordViewModel>()
+
+        for (item in courseDetailWithItems.items) {
+            val vm = RecordViewModel(item.recordType, year, month, day, "$year-$month-$day")
+            result.add(vm)
+        }
+
+        return result
+    }
+
     private fun mapDetailToCalendar() {
         calendars = Transformations.map(courseDetailRepo.getCourseAllRecord(courseId)) { details ->
             details.map { item ->
@@ -124,14 +121,20 @@ class DetailViewModel(application: Application): AndroidViewModel(application) {
         }
     }
 
+    private fun mapDetailToVM() {
+        itemList = Transformations.map(courseDetailRepo.getCourseAllRecord(courseId)) { details ->
+            details.flatMap { item ->
+                detailToVM(item)
+            }
+        }
+    }
+
     data class RecordViewModel (
-        var detailId: Long?,
-        var itemId: Long?,
         var type: Int,
         var year: Int,
         var month: Int,
         var day: Int,
-        var note: String?
+        var dateString: String,
     )
 
 
