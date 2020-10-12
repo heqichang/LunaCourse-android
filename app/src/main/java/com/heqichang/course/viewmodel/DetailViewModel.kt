@@ -55,6 +55,20 @@ class DetailViewModel(application: Application): AndroidViewModel(application) {
         courseRepo.updateCourse(course)
     }
 
+    fun selectItem(index: Int): List<Int> {
+
+        itemList?.value?.let {
+            if (index >= it.count()) {
+                return listOf()
+            }
+
+            val item = it[index]
+            return listOf(item.year, item.month, item.day)
+        }
+
+        return listOf()
+    }
+
     private fun detailToCalendar(courseDetail: CourseDetailWithItems): com.haibin.calendarview.Calendar {
 
         val date = Date(courseDetail.detail.recordTime)
@@ -100,7 +114,7 @@ class DetailViewModel(application: Application): AndroidViewModel(application) {
         val cal = Calendar.getInstance()
         cal.time = date
         val year = cal.get(Calendar.YEAR)
-        val month = cal.get(Calendar.MONTH)
+        val month = cal.get(Calendar.MONTH) + 1
         var day = cal.get(Calendar.DATE)
 
         var result = mutableListOf<RecordViewModel>()

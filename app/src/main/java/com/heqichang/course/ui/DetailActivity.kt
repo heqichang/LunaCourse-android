@@ -24,7 +24,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 
-class DetailActivity : AppCompatActivity(), CalendarView.OnCalendarSelectListener {
+class DetailActivity : AppCompatActivity(), CalendarView.OnCalendarSelectListener, CalendarView.OnMonthChangeListener, DetailRecyclerViewAdapter.DetailRecyclerViewClickListener {
 
     private lateinit var calendarView: CalendarView
     private lateinit var listRecyclerView: RecyclerView
@@ -42,7 +42,7 @@ class DetailActivity : AppCompatActivity(), CalendarView.OnCalendarSelectListene
 
         calendarView = findViewById(R.id.calendarView)
         calendarView.setOnCalendarSelectListener(this)
-
+        calendarView.setOnMonthChangeListener(this)
         
         viewModel.getCalendars()?.observe(this, {
             calendarView.clearSchemeDate()
@@ -54,6 +54,7 @@ class DetailActivity : AppCompatActivity(), CalendarView.OnCalendarSelectListene
         })
 
         adapter = DetailRecyclerViewAdapter()
+        adapter.setOnItemClickListener(this)
 
         listRecyclerView = findViewById(R.id.detailRecyclerView)
         listRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -62,6 +63,8 @@ class DetailActivity : AppCompatActivity(), CalendarView.OnCalendarSelectListene
         viewModel.getList()?.observe(this, {
             adapter.reload(it)
         })
+
+        supportActionBar?.subtitle = "${calendarView.curYear}-${calendarView.curMonth}"
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -148,4 +151,17 @@ class DetailActivity : AppCompatActivity(), CalendarView.OnCalendarSelectListene
         }
 
     }
+
+    override fun onMonthChange(year: Int, month: Int) {
+        supportActionBar?.subtitle = "$year-$month"
+    }
+
+    override fun listItemClicked(index: Int) {
+
+        val dayList = viewModel.selectItem(index)
+        if (dayList.count() > 0) {
+            calendarView.scrollToCalendar(dayList[0], dayList[1], dayList[2])
+        }
+    }
+
 }

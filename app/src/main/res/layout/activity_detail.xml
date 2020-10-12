@@ -23,7 +23,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:lunar_text_size="8sp"
-        app:min_year="2020"
+        app:min_year="2019"
         app:month_view="com.heqichang.course.ui.view.MonthView"
         app:month_view_show_mode="mode_only_current"
         app:other_month_text_color="#e1e1e1"
